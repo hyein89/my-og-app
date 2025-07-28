@@ -1,55 +1,61 @@
-// pages/api/og.tsx
-import { ImageResponse } from '@vercel/og';
-import type { NextRequest } from 'next/server';
+import { ImageResponse } from "@vercel/og";
+import { NextRequest } from "next/server";
 
 export const config = {
-  runtime: 'edge',
+  runtime: "edge",
 };
 
+// Preload Google Font (Poppins Bold)
+const poppins = fetch(
+  new URL("../../public/fonts/Poppins-Bold.ttf", import.meta.url)
+).then((res) => res.arrayBuffer());
+
 export default async function handler(req: NextRequest) {
+  const fontData = await poppins;
   const { searchParams } = new URL(req.url);
 
-  const title = searchParams.get('title') || 'Judul Default';
-  const imageUrl = searchParams.get('image') || 'https://my-og-app.vercel.app/mountains.jpg';
+  const title = searchParams.get("title") || "Judul Default";
+  const imageUrl = searchParams.get("image") || "https://via.placeholder.com/1200x630.png";
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: '1200px',
-          height: '630px',
-          position: 'relative',
-          fontFamily: 'sans-serif',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
+          width: "100%",
+          height: "100%",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          color: "white",
+          fontSize: 60,
+          fontFamily: "Poppins",
         }}
       >
-        {/* Background Image */}
+        {/* background image with dark overlay */}
         <img
           src={imageUrl}
-          alt="OG Background"
           style={{
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
-            filter: 'blur(4px) brightness(0.6)', // Blur dan agak gelap
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
           }}
         />
-
-        {/* Title Text */}
         <div
           style={{
-            position: 'relative',
-            zIndex: 1,
-            color: 'white',
-            fontSize: 64,
-            fontWeight: 'bold',
-            padding: '0 80px',
-            textAlign: 'center',
-            lineHeight: 1.2,
-            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8)',
+            position: "absolute",
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0, 0, 0, 0.4)", // dark overlay
+          }}
+        />
+        <div
+          style={{
+            padding: "0 60px",
+            zIndex: 10,
+            textAlign: "center",
+            textShadow: "2px 2px 10px rgba(0,0,0,0.7)",
           }}
         >
           {title}
@@ -59,6 +65,13 @@ export default async function handler(req: NextRequest) {
     {
       width: 1200,
       height: 630,
+      fonts: [
+        {
+          name: "Poppins",
+          data: fontData,
+          style: "normal",
+        },
+      ],
     }
   );
 }
