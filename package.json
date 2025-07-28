@@ -1,0 +1,19 @@
+{
+  "name": "my-og-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@vercel/og": "^0.6.1",
+    "next": "14.2.3",
+    "react": "18.3.0",
+    "react-dom": "18.3.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  }
+}
