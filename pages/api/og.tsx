@@ -1,68 +1,46 @@
-// pages/api/og.tsx
-import { ImageResponse } from "@vercel/og";
-import { NextRequest } from "next/server";
+import { ImageResponse } from '@vercel/og';
+import { NextRequest } from 'next/server';
 
 export const config = {
-  runtime: "edge",
+  runtime: 'edge',
 };
 
-// Optional: pakai font Inter dari Google Fonts (langsung via URL)
-const inter = fetch(
-  "https://fonts.gstatic.com/s/inter/v12/UcCO3FwrK3iLTcviYDQjOKzaj7t9F4g.ttf"
-).then((res) => res.arrayBuffer());
-
 export default async function handler(req: NextRequest) {
-  const fontData = await inter;
+  try {
+    const { searchParams } = new URL(req.url);
 
-  const { searchParams } = new URL(req.url);
-  const title =
-    searchParams.get("title") ||
-    "Fall Marathoners: It’s Time to Up the Miles and Find Your Pace";
+    const title = searchParams.get('title') || 'Judul Default';
+    const image = searchParams.get('image') || 'https://via.placeholder.com/1200x630.png?text=No+Image';
 
-  const image =
-    searchParams.get("image") ||
-    "https://static01.nyt.com/images/2023/08/22/multimedia/21MARATHON-TRAINING-BUILDING1-blwc/21MARATHON-TRAINING-BUILDING1-blwc-facebookJumbo.jpg";
-
-  return new ImageResponse(
-    (
-      <div
-        style={{
-          height: "100%",
-          width: "100%",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "flex-start",
-          justifyContent: "center",
-          backgroundImage: `url(${image})`,
-          backgroundRepeat: "no-repeat",
-          backgroundSize: "cover",
-          padding: "60px 80px",
-          color: "white",
-        }}
-      >
-        <h1
+    return new ImageResponse(
+      (
+        <div
           style={{
+            width: '1200px',
+            height: '630px',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-end',
+            padding: '50px',
+            backgroundImage: `url(${image})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            color: 'white',
             fontSize: 60,
-            fontFamily: "Inter",
-            fontWeight: "bold",
-            maxWidth: 900,
-            textShadow: "0 2px 10px rgba(0,0,0,0.7)",
+            fontWeight: 'bold',
+            textShadow: '2px 2px 8px rgba(0,0,0,0.7)',
           }}
         >
-          {title}
-        </h1>
-      </div>
-    ),
-    {
-      width: 1200,
-      height: 630,
-      fonts: [
-        {
-          name: "Inter",
-          data: fontData,
-          style: "normal",
-        },
-      ],
-    }
-  );
+          <div style={{ maxWidth: '90%' }}>{title}</div>
+        </div>
+      ),
+      {
+        width: 1200,
+        height: 630,
+      }
+    );
+  } catch (e) {
+    console.error('OG Image Error:', e);
+    return new Response('OG Image Error', { status: 500 });
+  }
 }
