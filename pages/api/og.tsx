@@ -1,61 +1,65 @@
-import { ImageResponse } from "@vercel/og";
-import { NextRequest } from "next/server";
+import { ImageResponse } from '@vercel/og';
+import { NextRequest } from 'next/server';
 
+// Aktifkan fitur edge
 export const config = {
-  runtime: "edge",
+  runtime: 'edge',
 };
 
-// Preload Google Font (Poppins Bold)
-const poppins = fetch(
-  new URL("../../public/fonts/Poppins-Bold.ttf", import.meta.url)
-).then((res) => res.arrayBuffer());
-
 export default async function handler(req: NextRequest) {
-  const fontData = await poppins;
-  const { searchParams } = new URL(req.url);
+  const { searchParams } = req.nextUrl;
+  const title = searchParams.get('title') || 'Tanpa Judul';
+  const imageName = searchParams.get('image') || 'default.jpg'; // image di folder /public/
 
-  const title = searchParams.get("title") || "Judul Default";
-  const imageUrl = searchParams.get("image") || "https://via.placeholder.com/1200x630.png";
+  const imageUrl = `${req.nextUrl.origin}/${imageName}`;
 
   return new ImageResponse(
     (
       <div
         style={{
-          width: "100%",
-          height: "100%",
-          position: "relative",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          color: "white",
-          fontSize: 60,
-          fontFamily: "Poppins",
+          width: '1200px',
+          height: '630px',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'Poppins',
         }}
       >
-        {/* background image with dark overlay */}
+        {/* Gambar latar belakang */}
         <img
           src={imageUrl}
           style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            zIndex: 0,
           }}
         />
+
+        {/* Overlay gelap semi transparan */}
         <div
           style={{
-            position: "absolute",
-            width: "100%",
-            height: "100%",
-            backgroundColor: "rgba(0, 0, 0, 0.4)", // dark overlay
+            position: 'absolute',
+            backgroundColor: 'rgba(0, 0, 0, 0.4)',
+            backdropFilter: 'blur(3px)',
+            width: '100%',
+            height: '100%',
+            zIndex: 1,
           }}
         />
+
+        {/* Judul */}
         <div
           style={{
-            padding: "0 60px",
-            zIndex: 10,
-            textAlign: "center",
-            textShadow: "2px 2px 10px rgba(0,0,0,0.7)",
+            position: 'relative',
+            zIndex: 2,
+            color: 'white',
+            fontSize: 64,
+            fontWeight: 700,
+            padding: '0 80px',
+            textAlign: 'center',
           }}
         >
           {title}
@@ -67,9 +71,11 @@ export default async function handler(req: NextRequest) {
       height: 630,
       fonts: [
         {
-          name: "Poppins",
-          data: fontData,
-          style: "normal",
+          name: 'Poppins',
+          data: await fetch(
+            'https://fonts.gstatic.com/s/poppins/v20/pxiEyp8kv8JHgFVrJJfedw.woff'
+          ).then((res) => res.arrayBuffer()),
+          style: 'normal',
         },
       ],
     }
