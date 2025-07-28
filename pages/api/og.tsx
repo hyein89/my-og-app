@@ -1,46 +1,64 @@
+// pages/api/og.tsx
 import { ImageResponse } from '@vercel/og';
-import { NextRequest } from 'next/server';
+import type { NextRequest } from 'next/server';
 
 export const config = {
   runtime: 'edge',
 };
 
 export default async function handler(req: NextRequest) {
-  try {
-    const { searchParams } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
 
-    const title = searchParams.get('title') || 'Judul Default';
-    const image = searchParams.get('image') || 'https://via.placeholder.com/1200x630.png?text=No+Image';
+  const title = searchParams.get('title') || 'Judul Default';
+  const imageUrl = searchParams.get('image') || 'https://my-og-app.vercel.app/mountains.jpg';
 
-    return new ImageResponse(
-      (
+  return new ImageResponse(
+    (
+      <div
+        style={{
+          width: '1200px',
+          height: '630px',
+          position: 'relative',
+          fontFamily: 'sans-serif',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
+        {/* Background Image */}
+        <img
+          src={imageUrl}
+          alt="OG Background"
+          style={{
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+            filter: 'blur(4px) brightness(0.6)', // Blur dan agak gelap
+          }}
+        />
+
+        {/* Title Text */}
         <div
           style={{
-            width: '1200px',
-            height: '630px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-            padding: '50px',
-            backgroundImage: `url(${image})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
+            position: 'relative',
+            zIndex: 1,
             color: 'white',
-            fontSize: 60,
+            fontSize: 64,
             fontWeight: 'bold',
-            textShadow: '2px 2px 8px rgba(0,0,0,0.7)',
+            padding: '0 80px',
+            textAlign: 'center',
+            lineHeight: 1.2,
+            textShadow: '2px 2px 8px rgba(0, 0, 0, 0.8)',
           }}
         >
-          <div style={{ maxWidth: '90%' }}>{title}</div>
+          {title}
         </div>
-      ),
-      {
-        width: 1200,
-        height: 630,
-      }
-    );
-  } catch (e) {
-    console.error('OG Image Error:', e);
-    return new Response('OG Image Error', { status: 500 });
-  }
+      </div>
+    ),
+    {
+      width: 1200,
+      height: 630,
+    }
+  );
 }
