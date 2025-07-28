@@ -1,62 +1,65 @@
-import { ImageResponse } from '@vercel/og';
-import { NextRequest } from 'next/server';
+// app/api/og/route.tsx
+import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-export async function GET(req: NextRequest) {
+export async function GET(req: Request) {
   const { searchParams } = new URL(req.url);
 
   const title = searchParams.get('title') || 'Judul Default';
-  const imageName = searchParams.get('image') || 'default.jpg';
-  const host = req.headers.get('host');
-  const imageUrl = `https://${host}/${imageName}`;
+  const image = searchParams.get('image') || 'mountains.jpg';
+
+  // Buat full path ke file public
+  const imageUrl = `https://${req.headers.get('host')}/${image}`;
 
   return new ImageResponse(
     (
-      <div style={{
-        width: '1200px',
-        height: '630px',
-        position: 'relative',
-        backgroundColor: '#000',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontFamily: 'sans-serif',
-      }}>
-        {/* Background image dengan object-fit contain */}
+      <div
+        style={{
+          width: '1200px',
+          height: '630px',
+          position: 'relative',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontFamily: 'Arial, sans-serif',
+        }}
+      >
+        {/* Background image */}
         <img
           src={imageUrl}
-          alt="OG Image"
+          alt="OG"
           style={{
             position: 'absolute',
-            maxWidth: '100%',
-            maxHeight: '100%',
-            objectFit: 'contain',
-            zIndex: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
           }}
         />
 
-        {/* Overlay gelap tipis agar teks terbaca */}
-        <div style={{
-          position: 'absolute',
-          inset: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          zIndex: 1,
-        }} />
+        {/* Overlay gelap */}
+        <div
+          style={{
+            position: 'absolute',
+            background: 'rgba(0, 0, 0, 0.5)',
+            backdropFilter: 'blur(4px)',
+            width: '100%',
+            height: '100%',
+          }}
+        />
 
-        {/* Judul */}
-        <div style={{
-          position: 'relative',
-          zIndex: 2,
-          color: 'white',
-          fontSize: 60,
-          fontWeight: 'bold',
-          textAlign: 'center',
-          padding: '0 80px',
-          lineHeight: 1.2,
-        }}>
+        {/* Title */}
+        <h1
+          style={{
+            color: 'white',
+            fontSize: 72,
+            padding: '0 60px',
+            textAlign: 'center',
+            zIndex: 1,
+          }}
+        >
           {title}
-        </div>
+        </h1>
       </div>
     ),
     {
